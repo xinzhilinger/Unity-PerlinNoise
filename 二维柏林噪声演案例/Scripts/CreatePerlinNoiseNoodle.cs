@@ -17,7 +17,7 @@ public class CreatePerlinNoiseNoodle : MonoBehaviour
 
     public float[,] items;
 
-    [Range(0,3)]
+    [Range(0,10)]
     public float MaxNoise;
 
     public int[] perm={ 151,160,137,91,90,15,                 // Hash lookup table as defined by Ken Perlin.  This is a randomly
@@ -38,38 +38,24 @@ public class CreatePerlinNoiseNoodle : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log(perm.Length);
+
         items = new float[v2.x+1, v2.y+1];
         CreatePoints();
-        text(); 
+        CreateNoodle();
     }
 
-    void text()
-    {
-        Debug.Log(10 & 2);
-        Debug.Log(10 & 10);
-        Debug.Log(10 & 16);
-    }
 
-    private void Update()
-    {
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            CreateNoodle();
-
-        }
-    }
+   
 
     //如果将不重复的256个数一一映射到256整数点
     public int FromPermGetPosNum(int x,int y)
     {
         //首先256个点组成了一个16*16的矩阵
         x = x % 255;
-        y = y & 255;
-        
-
-
-        return perm[x];
+        y = y % 255;      
+        return perm[perm[x]%255+y];
     }
 
     //获取整数点的数值，并实例化一个物体在该位置
@@ -79,8 +65,8 @@ public class CreatePerlinNoiseNoodle : MonoBehaviour
         {
             for (int j = 0; j < v2.y; j++)
             {
-                float num = UnityEngine.Random.Range(0, MaxNoise);
-                //float num= FromPermGetPosNum
+                //float num = UnityEngine.Random.Range(0, MaxNoise);
+                float num = (float)FromPermGetPosNum(i,j)/255*MaxNoise;
                 GameObject go = Instantiate(itemPre, parent);
                 go.transform.position = new Vector3(i+1, num, j+1);
                 items[i, j] = num;
@@ -92,7 +78,6 @@ public class CreatePerlinNoiseNoodle : MonoBehaviour
 
     public void CreateNoodle()
     {
-
         for (int i = 0; i < v2.x - 1; i++)
         {
             for (int j = 0; j < v2.y - 1; j++)
@@ -113,7 +98,6 @@ public class CreatePerlinNoiseNoodle : MonoBehaviour
                 float inter = Mathf.Lerp(interX, interY, InterpolationCalculation1(j/ 10f));
                 GameObject go = Instantiate(itemPre, parent);
                 go.transform.position = new Vector3(x+ i /10f+1, inter, y+ j/10f+1);
-
             }
         }
     }
